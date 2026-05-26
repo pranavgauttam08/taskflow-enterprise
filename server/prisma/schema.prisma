@@ -1,0 +1,81 @@
+// TaskFlow Enterprise Database Schema
+// Using SQLite for development - swap to PostgreSQL for production
+// Just change provider to "postgresql" and update DATABASE_URL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String    @id @default(cuid())
+  email      String    @unique
+  name       String
+  password   String
+  role       String    @default("EMPLOYEE")
+  department String
+  avatarUrl  String?
+  isActive   Boolean   @default(true)
+  lastLogin  DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  tasks      Task[]
+  sessions   Session[]
+}
+
+model Task {
+  id                  String   @id @default(cuid())
+  userId              String
+  user                User     @relation(fields: [userId], references: [id])
+  title               String
+  description         String?
+  date                DateTime
+  timeSlot            String
+  slotHour            Int
+  priority            String   @default("MEDIUM")
+  tags                String   @default("[]")
+  status              String   @default("PENDING")
+  completedAt         DateTime?
+  notCompletedAt      DateTime?
+  notCompletedReason  String?
+  reasonCategory      String?
+  estimatedHours      Float    @default(1)
+  actualHours         Float?
+  adminNote           String?
+  adminReviewed       Boolean  @default(false)
+  reviewedAt          DateTime?
+  resolvedAt          DateTime?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@index([userId])
+  @@index([date])
+  @@index([status])
+  @@index([userId, date])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String
+  action    String
+  entity    String
+  entityId  String?
+  details   String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+}
