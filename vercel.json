@@ -1,0 +1,33 @@
+{
+  "version": 2,
+  "env": {
+    "DATABASE_URL": "@DATABASE_URL",
+    "JWT_SECRET": "@JWT_SECRET",
+    "JWT_REFRESH_SECRET": "@JWT_REFRESH_SECRET",
+    "NODE_ENV": "production"
+  },
+  "builds": [
+    {
+      "src": "client/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist",
+        "buildCommand": "cd ../client && npm run build"
+      }
+    },
+    {
+      "src": "api/index.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "api/index.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "client/dist/$1"
+    }
+  ]
+}

@@ -3,7 +3,6 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
 import Sidebar from './components/layout/Sidebar';
 import AdminSidebar from './components/layout/AdminSidebar';
-import ErrorBoundary from './components/ErrorBoundary';
 
 /* ---- Lazy-loaded pages (code-split per route) ---- */
 const Login = lazy(() => import('./pages/Login'));
@@ -141,9 +140,5 @@ function AppRoutes() {
 }
 
 export default function App() {
-  return (
-    <ErrorBoundary>
-      <AppRoutes />
-    </ErrorBoundary>
-  );
+  return <AppRoutes />;
 }
