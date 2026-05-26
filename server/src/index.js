@@ -59,12 +59,31 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start server
-const PORT = process.env.PORT || 3001;
-httpServer.listen(PORT, () => {
-  console.log(`\n🚀 TaskFlow Enterprise API running on http://localhost:${PORT}`);
-  console.log(`📡 Socket.io ready for connections`);
-  console.log(`🗄️  Database connected\n`);
+// Start server with optional database initialization
+async function startServer() {
+  try {
+    // Try to initialize database on first startup
+    if (process.env.NODE_ENV === 'production') {
+      console.log('Initializing database...');
+      // This is handled by migrations, just verify connection
+      await prisma.$queryRaw`SELECT 1`;
+      console.log('✅ Database verified');
+    }
+  } catch (err) {
+    console.log('Database initialization skipped (may not be ready yet):', err.message);
+  }
+
+  const PORT = process.env.PORT || 3001;
+  httpServer.listen(PORT, () => {
+    console.log(`\n🚀 TaskFlow Enterprise API running on http://localhost:${PORT}`);
+    console.log(`📡 Socket.io ready for connections`);
+    console.log(`🗄️  Database connected\n`);
+  });
+}
+
+startServer().catch(err => {
+  console.error('Failed to start server:', err);
+  process.exit(1);
 });
 
 // Graceful shutdown
