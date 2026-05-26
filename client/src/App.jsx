@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
 import Sidebar from './components/layout/Sidebar';
 import AdminSidebar from './components/layout/AdminSidebar';
+import ErrorBoundary from './components/ErrorBoundary';
 
 /* ---- Lazy-loaded pages (code-split per route) ---- */
 const Login = lazy(() => import('./pages/Login'));
@@ -105,8 +106,8 @@ function AdminLayout({ children }) {
   );
 }
 
-/* ---- App ---- */
-export default function App() {
+/* ---- App Routes ---- */
+function AppRoutes() {
   const { user, loading } = useAuth();
 
   if (loading) return <LoadingScreen />;
@@ -136,5 +137,13 @@ export default function App() {
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Suspense>
+  );
+}
+
+export default function App() {
+  return (
+    <ErrorBoundary>
+      <AppRoutes />
+    </ErrorBoundary>
   );
 }
